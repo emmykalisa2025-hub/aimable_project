@@ -1,0 +1,6 @@
+Voucher ID,Beneficiary Number,Age,Sex,Consultation Cost,Laboratory Cost,Medical Imaging Cost,Procedures,Medicines,Total Amount
+VC001,BN001,34,M,5000,8000,0,2,3,13000
+VC002,BN002,57,F,4000,12000,5000,1,4,26000
+VC003,BN003,42,M,6000,3000,0,0,2,9000
+VC004,BN004,29,F,3000,2000,0,1,1,6000
+VC005,BN005,65,M,7000,9000,2000,3,5,28000
