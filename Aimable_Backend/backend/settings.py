@@ -31,7 +31,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-71t%+q6lw@fx(s_j-4n9@9@taw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "aimable-backend.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -147,11 +151,19 @@ REST_FRAMEWORK = {
 }
 
 
+ALLOWED_HOSTS = [
+    "aimable-backend.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "https://aimable-project.onrender.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://aimable-project.onrender.com",
 ]
 
 
