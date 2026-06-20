@@ -101,6 +101,10 @@ def dashboard_summary(request):
 		# Silently keep the default example numbers if anything goes wrong.
 		pass
 
+	from ml.models import ModelRun
+	ml_models_total = ModelRun.objects.count()
+	ml_models_production = ModelRun.objects.filter(status="deployed").count()
+
 	data = {
 		"totalUsers": total_users,
 		"activeUsers": active_users,
@@ -109,9 +113,8 @@ def dashboard_summary(request):
 		"totalClaims": total_claims,
 		"flaggedClaims": flagged_claims,
 		"fraudCases": fraud_cases,
-		# Placeholders for future ML model integration.
-		"mlModelsTotal": 0,
-		"mlModelsProduction": 0,
+		"mlModelsTotal": ml_models_total,
+		"mlModelsProduction": ml_models_production,
 		"recentActivities": recent_activities,
 		"performance": {
 			"cpu": cpu_usage,
