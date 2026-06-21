@@ -38,9 +38,9 @@ const roleNavigation: Record<string, Array<{ label: string; path: string; icon: 
   ],
   scientist: [
     { label: "Dashboard", path: "/scientist/dashboard", icon: "📊" },
-    { label: "Model Training", path: "/scientist/training", icon: "🧠" },
-    { label: "Model Evaluation", path: "/scientist/evaluation", icon: "📈" },
-    { label: "Deploy Model", path: "/scientist/deploy", icon: "🚀" },
+    // { label: "Model Training", path: "/scientist/training", icon: "🧠" },
+    // { label: "Model Evaluation", path: "/scientist/evaluation", icon: "📈" },
+    // { label: "Deploy Model", path: "/scientist/deploy", icon: "🚀" },
   ],
   facility: [
     { label: "Dashboard", path: "/facility/dashboard", icon: "📊" },
