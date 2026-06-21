@@ -16,6 +16,9 @@ from django.utils.text import get_valid_filename
 
 from .models import Claim, UserProfile, SystemLog
 from .serializers import ClaimSerializer, AdminUserSerializer, SystemLogSerializer
+import logging 
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -221,9 +224,24 @@ class ClaimViewSet(viewsets.ModelViewSet):
 		timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
 		original_name = get_valid_filename(uploaded_file.name)
 		stored_relative_path = f"claims/{timestamp}_{original_name}"
-		stored_path = default_storage.save(stored_relative_path, uploaded_file)
-		# Ensure file pointer is reset before parsing
-		uploaded_file.seek(0)
+	
+		try:
+			stored_path = default_storage.save(stored_relative_path, uploaded_file)
+			uploaded_file.seek(0)
+		except Exception as exc:
+			logger.exception("Failed to save uploaded claims file")
+
+			return Response(
+				{
+					"detail": (
+						"Failed to save uploaded file: "
+						+ type(exc).__name__
+						+ ": "
+						+ str(exc)
+					)
+				},
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+			)
 
 		filename = uploaded_file.name.lower()
 		rows = []
@@ -471,7 +489,7 @@ class ClaimViewSet(viewsets.ModelViewSet):
 				continue
 
 			try:
-				amount = Decimal(amount_str or "0")
+				amount = Decimal(amount_str.replace(",", "").strip() or "0")
 			except Exception:
 				amount = Decimal("0")
 
@@ -487,23 +505,40 @@ class ClaimViewSet(viewsets.ModelViewSet):
 			procedures_cost = _parse_decimal(procedures_str)
 			medicines_cost = _parse_decimal(medicines_str)
 
-			claim, created = Claim.objects.get_or_create(
-				claim_number=claim_number,
-				defaults={
-					"policy_holder": policy_holder,
-					"amount": amount,
-					"consultation_cost": consultation_cost,
-					"laboratory_cost": laboratory_cost,
-					"imaging_cost": imaging_cost,
-					"procedures_cost": procedures_cost,
-					"medicines_cost": medicines_cost,
-					"service_date": service_date,
-					"is_flagged": False,
-					"is_fraud": False,
-					"risk_score": Decimal("0"),
-					"review_status": Claim.ReviewStatus.PENDING,
-				},
-			)
+			try:
+				claim, created = Claim.objects.get_or_create(
+					claim_number=claim_number,
+					defaults={
+						"policy_holder": policy_holder,
+						"amount": amount,
+						"consultation_cost": consultation_cost,
+						"laboratory_cost": laboratory_cost,
+						"imaging_cost": imaging_cost,
+						"procedures_cost": procedures_cost,
+						"medicines_cost": medicines_cost,
+						"service_date": service_date,
+						"is_flagged": False,
+						"is_fraud": False,
+						"risk_score": Decimal("0"),
+						"review_status": Claim.ReviewStatus.PENDING,
+					},
+				)
+			except Exception as exc:
+				logger.exception("Failed to save claim %s", claim_number)
+
+				return Response(
+					{
+						"detail": (
+							"Failed to save claim '"
+							+ str(claim_number)
+							+ "': "
+							+ type(exc).__name__
+							+ ": "
+							+ str(exc)
+						)
+					},
+					status=status.HTTP_400_BAD_REQUEST,
+				)
 			if created:
 				created_count += 1
 				created_ids.append(claim.id)
