@@ -31,13 +31,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-71t%+q6lw@fx(s_j-4n9@9@taw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-    "https://fraud-detection-ryin.onrender.com",
-    "localhost",
-    "127.0.0.1",
-]
-
-
 # Application definition
 
 INSTALLED_APPS = [
