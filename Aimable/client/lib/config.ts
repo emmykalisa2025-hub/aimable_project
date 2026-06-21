@@ -1,12 +1,9 @@
 const rawBase = import.meta.env.VITE_API_BASE;
 
 if (!rawBase) {
-  throw new Error(
-    "VITE_API_BASE is missing. Add it in the frontend environment variables.",
-  );
+  throw new Error("VITE_API_BASE is missing in the frontend environment.");
 }
 
-// Remove any trailing slash
 export const API_BASE = rawBase.replace(/\/+$/, "");
 
 export function api(path: string): string {
@@ -15,4 +12,3 @@ export function api(path: string): string {
 }
 
 export default API_BASE;
-
