@@ -138,6 +138,10 @@ STORAGES = {
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Allow uploads up to 300 MB 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 300 * 1024 * 1024 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 300 * 1024 * 1024
+
 
 # Django REST Framework
 REST_FRAMEWORK = {
