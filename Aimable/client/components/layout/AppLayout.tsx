@@ -34,7 +34,7 @@ const roleNavigation: Record<string, Array<{ label: string; path: string; icon: 
   analyst: [
     { label: "Dashboard", path: "/analyst/dashboard", icon: "📊" },
     { label: "Claims Review", path: "/analyst/claims", icon: "📝" },
-    { label: "Investigation Reports", path: "/analyst/reports", icon: "📑" },
+    // { label: "Investigation Reports", path: "/analyst/reports", icon: "📑" },
   ],
   scientist: [
     { label: "Dashboard", path: "/scientist/dashboard", icon: "📊" },
