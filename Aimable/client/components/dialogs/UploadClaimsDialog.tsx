@@ -38,9 +38,15 @@ export default function UploadClaimsDialog({
       return false;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB");
-      return false;
+    // if (file.size > 10 * 1024 * 1024) {
+    //   setError("File size must be less than 10MB");
+    //   return false;
+    // }
+    
+    const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300 MB 
+    if (file.size > MAX_FILE_SIZE) { 
+      setError("File size must be less than 300MB."); 
+      return; 
     }
 
     setError("");
@@ -135,7 +141,7 @@ export default function UploadClaimsDialog({
                     Click to upload or drag and drop
                   </p>
                   <p className="text-sm text-gray-600">
-                    Excel (.xlsx, .xls) or CSV files up to 10MB
+                    Excel (.xlsx, .xls) or CSV files up to 300MB
                   </p>
                 </div>
               </div>
