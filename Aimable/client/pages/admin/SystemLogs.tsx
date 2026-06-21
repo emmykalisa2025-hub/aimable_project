@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { useEffect, useState, useMemo } from "react";
 import { Search, Download, AlertCircle, CheckCircle, Info, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { api } from "@/lib/config";
 
 type LogLevel = "info" | "warning" | "error" | "success";
 
@@ -17,7 +18,7 @@ interface SystemLog {
   userId?: string;
 }
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+// use api() helper for backend endpoints
 
 // Mock log data
 const mockLogs: SystemLog[] = [
@@ -185,7 +186,7 @@ export default function SystemLogs() {
       setError(null);
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/admin/system-logs/`, {
+        const response = await fetch(api("/admin/system-logs/"), {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/config";
 
 type UserRole = "admin" | "analyst" | "scientist" | "facility";
 
@@ -49,7 +50,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/token/", {
+      const response = await fetch(api("/api/auth/token/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +77,7 @@ export default function Login() {
       let resolvedName: string | null = null;
 
       try {
-        const profileResponse = await fetch("http://127.0.0.1:8000/api/me/", {
+        const profileResponse = await fetch(api("/api/me/"), {
           method: "GET",
           headers: {
             Authorization: `Bearer ${data.access}`,

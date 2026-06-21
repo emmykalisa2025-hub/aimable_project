@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useEffect, useState } from "react";
 import { Users, Settings, AlertCircle, Activity } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import { api } from "@/lib/config";
 
 interface DashboardStats {
   totalUsers: number;
@@ -52,7 +51,7 @@ export default function AdminDashboard() {
       setError(null);
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/summary/`, {
+        const response = await fetch(api("/api/summary/"), {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },

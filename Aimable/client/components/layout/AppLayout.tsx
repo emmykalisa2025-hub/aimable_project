@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LogOut, Menu } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/config";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -58,7 +59,7 @@ export function AppLayout({ children, userRole, userName }: AppLayoutProps) {
       const refreshToken = sessionStorage.getItem("refreshToken");
 
       if (refreshToken) {
-        await fetch("http://127.0.0.1:8000/api/auth/logout/", {
+        await fetch(api("/api/auth/logout/"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

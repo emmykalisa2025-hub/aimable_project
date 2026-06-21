@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/lib/config";
 import UploadClaimsDialog from "@/components/dialogs/UploadClaimsDialog";
 import InvestigationNoteDialog from "@/components/dialogs/InvestigationNoteDialog";
 import MarkFraudDialog from "@/components/dialogs/MarkFraudDialog";
@@ -119,7 +120,7 @@ export default function AnalystDashboard() {
     const formData = new FormData();
     formData.append("file", file);
 
-    fetch("http://127.0.0.1:8000/api/claims/upload/", {
+    fetch(api("/api/claims/upload/"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -177,7 +178,7 @@ export default function AnalystDashboard() {
     setSelectedClaim(claim);
     if (claim && accessToken) {
       // Generate a suggested note based on the latest model prediction and rules
-      fetch("http://127.0.0.1:8000/api/ml/predict-claim-risk/", {
+      fetch(api("/api/ml/predict-claim-risk/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -286,7 +287,7 @@ ${selectedClaim.investigationNotes.map((note) => `- ${note}`).join("\n")}
   useQuery({
     queryKey: ["claims"],
     queryFn: async () => {
-      const response = await fetch("http://127.0.0.1:8000/api/claims/", {
+      const response = await fetch(api("/api/claims/"), {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -325,7 +326,7 @@ ${selectedClaim.investigationNotes.map((note) => `- ${note}`).join("\n")}
 
   const addNoteMutation = useMutation({
     mutationFn: async ({ claimId, note }: { claimId: number; note: string }) => {
-      const response = await fetch(`http://127.0.0.1:8000/api/claims/${claimId}/add-note/`, {
+      const response = await fetch(api(`/api/claims/${claimId}/add-note/`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -379,7 +380,7 @@ ${selectedClaim.investigationNotes.map((note) => `- ${note}`).join("\n")}
       else backendStatus = "legitimate";
 
       const response = await fetch(
-        `http://127.0.0.1:8000/api/claims/${claimId}/set-review-status/`,
+        api(`/api/claims/${claimId}/set-review-status/`),
         {
           method: "POST",
           headers: {
@@ -429,7 +430,7 @@ ${selectedClaim.investigationNotes.map((note) => `- ${note}`).join("\n")}
 
   const deleteClaimsMutation = useMutation({
     mutationFn: async (ids: number[]) => {
-      const response = await fetch("http://127.0.0.1:8000/api/claims/bulk-delete/", {
+      const response = await fetch(api("/api/claims/bulk-delete/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

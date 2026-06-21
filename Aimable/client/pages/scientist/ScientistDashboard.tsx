@@ -17,8 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { Activity, Zap, Award, TrendingUp } from "lucide-react";
-
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { api } from "@/lib/config";
 
 interface ModelMetrics {
   id: number;
@@ -87,7 +86,7 @@ export default function ScientistDashboard() {
   };
 
   const fetchModelRuns = async (): Promise<ModelMetrics[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/ml/model-runs/`, {
+    const response = await fetch(api("/api/ml/model-runs/"), {
       headers: {
         "Content-Type": "application/json",
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -129,7 +128,7 @@ export default function ScientistDashboard() {
         parameters: formData,
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/ml/model-runs/`, {
+      const response = await fetch(api("/api/ml/model-runs/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,7 +165,7 @@ export default function ScientistDashboard() {
 
   const updateModelMutation = useMutation({
     mutationFn: async (args: { id: number; data: Partial<{ name: string; status: string }> }) => {
-      const response = await fetch(`${API_BASE_URL}/api/ml/model-runs/${args.id}/`, {
+      const response = await fetch(api(`/api/ml/model-runs/${args.id}/`), {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -212,7 +211,7 @@ export default function ScientistDashboard() {
 
   const deleteModelMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${API_BASE_URL}/api/ml/model-runs/${id}/`, {
+      const response = await fetch(api(`/api/ml/model-runs/${id}/`), {
         method: "DELETE",
         headers: {
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

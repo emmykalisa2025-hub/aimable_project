@@ -17,6 +17,7 @@ import { Trash2, Upload } from "lucide-react";
 import UploadClaimsDialog from "@/components/dialogs/UploadClaimsDialog";
 import InvestigationNoteDialog from "@/components/dialogs/InvestigationNoteDialog";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/lib/config";
 
 interface FraudPredictionRow {
   voucher: string;
@@ -103,7 +104,7 @@ export default function ClaimsReview() {
     const formData = new FormData();
     formData.append("file", file);
 
-    fetch("http://127.0.0.1:8000/api/claims/upload/", {
+    fetch(api("/api/claims/upload/"), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -160,7 +161,7 @@ export default function ClaimsReview() {
 
   const addNoteMutation = useMutation({
     mutationFn: async ({ claimId, note }: { claimId: number; note: string }) => {
-      const response = await fetch(`http://127.0.0.1:8000/api/claims/${claimId}/add-note/`, {
+      const response = await fetch(api(`/api/claims/${claimId}/add-note/`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -196,7 +197,7 @@ export default function ClaimsReview() {
       }
 
       for (const id of ids) {
-        const response = await fetch("http://127.0.0.1:8000/api/ml/predict-claim-risk/", {
+        const response = await fetch(api("/api/ml/predict-claim-risk/"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -236,7 +237,7 @@ export default function ClaimsReview() {
   } = useQuery<FraudPredictionRow[]>({
     queryKey: ["claims", "predictions"],
     queryFn: async () => {
-      const response = await fetch("http://127.0.0.1:8000/api/claims/", {
+      const response = await fetch(api("/api/claims/"), {
         headers: {
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -325,7 +326,7 @@ export default function ClaimsReview() {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/ml/predict-claim-risk/", {
+    fetch(api("/api/ml/predict-claim-risk/"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -385,7 +386,7 @@ export default function ClaimsReview() {
 
   const deleteClaimsMutation = useMutation({
     mutationFn: async (ids: number[]) => {
-      const response = await fetch("http://127.0.0.1:8000/api/claims/bulk-delete/", {
+      const response = await fetch(api("/api/claims/bulk-delete/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

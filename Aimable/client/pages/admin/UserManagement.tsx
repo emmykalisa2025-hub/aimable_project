@@ -8,6 +8,7 @@ import ViewUserDialog from "@/components/dialogs/ViewUserDialog";
 import EditUserDialog from "@/components/dialogs/EditUserDialog";
 import DeleteUserDialog from "@/components/dialogs/DeleteUserDialog";
 import AddUserDialog from "@/components/dialogs/AddUserDialog";
+import { api } from "@/lib/config";
 
 type UserRole = "admin" | "analyst" | "scientist" | "facility";
 
@@ -24,7 +25,7 @@ interface User {
   lastLogin: string;
 }
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+// use api() helper for backend endpoints
 
 const roleLabels: Record<UserRole, string> = {
   admin: "System Administrator",
@@ -53,7 +54,7 @@ export default function UserManagement() {
       setLoading(true);
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/admin/users/`, {
+        const response = await fetch(api("/admin/users/"), {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },
@@ -131,7 +132,7 @@ export default function UserManagement() {
     const toggle = async () => {
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/toggle-status/`, {
+        const response = await fetch(api(`/admin/users/${userId}/toggle-status/`), {
           method: "POST",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -157,7 +158,7 @@ export default function UserManagement() {
     const save = async () => {
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/admin/users/${selectedUser.id}/`, {
+        const response = await fetch(api(`/admin/users/${selectedUser.id}/`), {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -189,7 +190,7 @@ export default function UserManagement() {
     const remove = async () => {
       try {
         const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(`${API_BASE_URL}/admin/users/${selectedUser.id}/`, {
+        const response = await fetch(api(`/admin/users/${selectedUser.id}/`), {
           method: "DELETE",
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
@@ -230,7 +231,7 @@ export default function UserManagement() {
           hasToken: Boolean(token),
         });
 
-        const response = await fetch(`${API_BASE_URL}/admin/users/`, {
+        const response = await fetch(api("/admin/users/"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

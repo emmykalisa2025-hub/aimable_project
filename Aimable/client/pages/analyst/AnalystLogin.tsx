@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/config";
 
 export default function AnalystLogin() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function AnalystLogin() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/token/", {
+      const response = await fetch(api("/api/auth/token/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +37,7 @@ export default function AnalystLogin() {
 
       // Verify that this account is actually a Fraud Analyst
       try {
-        const profileResponse = await fetch("http://127.0.0.1:8000/api/me/", {
+        const profileResponse = await fetch(api("/api/me/"), {
           method: "GET",
           headers: {
             Authorization: `Bearer ${data.access}`,
