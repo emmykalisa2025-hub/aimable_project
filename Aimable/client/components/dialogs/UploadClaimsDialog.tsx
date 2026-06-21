@@ -26,6 +26,7 @@ export default function UploadClaimsDialog({
   const [error, setError] = useState<string>("");
 
   const allowedFormats = [".xlsx", ".xls", ".csv"];
+  const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300 MB
 
   const validateFile = (file: File) => {
     const fileName = file.name.toLowerCase();
@@ -43,10 +44,9 @@ export default function UploadClaimsDialog({
     //   return false;
     // }
     
-    const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300 MB 
-    if (file.size > MAX_FILE_SIZE) { 
-      setError("File size must be less than 300MB."); 
-      return; 
+   if (file.size > MAX_FILE_SIZE) {
+      setError("File size must be 300MB or less.");
+      return false;
     }
 
     setError("");
@@ -183,7 +183,7 @@ export default function UploadClaimsDialog({
               Upload Medical Claims
             </p>
             <p className="text-xs text-blue-800 mb-2">
-              Accepted format: <span className="font-semibold">.xlsx / .csv</span>
+              Accepted format: <span className="font-semibold">.xlsx / .xls / .csv</span>
             </p>
             <p className="text-xs font-semibold text-blue-900 mb-1">
               Columns required:
