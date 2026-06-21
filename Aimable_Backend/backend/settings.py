@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-71t%+q6lw@fx(s_j-4n9@9@taw
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
-    "aimable-backend.onrender.com",
+    "https://fraud-detection-ryin.onrender.com",
     "localhost",
     "127.0.0.1",
 ]
@@ -152,7 +152,7 @@ REST_FRAMEWORK = {
 
 
 ALLOWED_HOSTS = [
-    "aimable-backend.onrender.com",
+    "https://fraud-detection-ryin.onrender.com",
     "localhost",
     "127.0.0.1",
 ]
