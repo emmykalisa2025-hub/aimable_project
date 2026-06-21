@@ -68,49 +68,64 @@ const [editDialogOpen, setEditDialogOpen] = useState(false);
 const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-useEffect(() => {
-const fetchUsers = async () => {
+const getAuthHeaders = () => {
+const token = sessionStorage.getItem("accessToken");
+
+```
+return token
+  ? { Authorization: "Bearer " + token }
+  : {};
+```
+
+};
+
+const loadUsers = async () => {
 setLoading(true);
 
 ```
-  try {
-    const token = sessionStorage.getItem("accessToken");
+try {
+  const response = await fetch(api("/api/admin/users/"), {
+    headers: getAuthHeaders(),
+  });
 
-    const response = await fetch(api("/api/admin/users/"), {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-
-    if (!response.ok) {
-      console.error("Failed to load users", await response.text());
-      return;
-    }
-
-    const data: User[] = await response.json();
-    setUsers(data);
-  } catch (error) {
-    console.error("Error loading users", error);
-  } finally {
-    setLoading(false);
+  if (!response.ok) {
+    console.error("Failed to load users:", await response.text());
+    return;
   }
-};
 
-void fetchUsers();
+  const data = await response.json();
+
+  if (Array.isArray(data)) {
+    setUsers(data);
+  } else if (Array.isArray(data.results)) {
+    setUsers(data.results);
+  } else {
+    setUsers([]);
+  }
+} catch (error) {
+  console.error("Error loading users:", error);
+} finally {
+  setLoading(false);
+}
 ```
 
+};
+
+useEffect(() => {
+void loadUsers();
 }, []);
 
 const filteredUsers = useMemo(() => {
-return users.filter((user) => {
-const fullName =
-user.name ||
-[user.firstName, user.lastName].filter(Boolean).join(" ") ||
-"";
+const term = searchTerm.toLowerCase();
 
 ```
+return users.filter((user) => {
+  const fullName =
+    user.name ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    "";
+
   const username = user.username || "";
-  const term = searchTerm.toLowerCase();
 
   return (
     fullName.toLowerCase().includes(term) ||
@@ -122,7 +137,11 @@ user.name ||
 
 }, [users, searchTerm]);
 
-const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+const totalPages = Math.max(
+1,
+Math.ceil(filteredUsers.length / itemsPerPage),
+);
+
 const startIndex = (currentPage - 1) * itemsPerPage;
 const endIndex = startIndex + itemsPerPage;
 const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
@@ -148,24 +167,20 @@ setDeleteDialogOpen(true);
 };
 
 const handleToggleStatus = (userId: number) => {
-const toggle = async () => {
+const toggleUserStatus = async () => {
 try {
-const token = sessionStorage.getItem("accessToken");
+const response = await fetch(
+api("/api/admin/users/" + userId + "/toggle-status/"),
+{
+method: "POST",
+headers: getAuthHeaders(),
+},
+);
 
 ```
-    const response = await fetch(
-      api(`/api/admin/users/${userId}/toggle-status/`),
-      {
-        method: "POST",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      },
-    );
-
     if (!response.ok) {
       console.error(
-        "Failed to toggle user status",
+        "Failed to toggle user status:",
         await response.text(),
       );
       return;
@@ -179,11 +194,11 @@ const token = sessionStorage.getItem("accessToken");
       ),
     );
   } catch (error) {
-    console.error("Error toggling user status", error);
+    console.error("Error toggling user status:", error);
   }
 };
 
-void toggle();
+void toggleUserStatus();
 ```
 
 };
@@ -192,24 +207,24 @@ const handleEditSubmit = (updatedUser: Partial<User>) => {
 if (!selectedUser) return;
 
 ```
-const save = async () => {
+const saveUser = async () => {
   try {
-    const token = sessionStorage.getItem("accessToken");
-
     const response = await fetch(
-      api(`/api/admin/users/${selectedUser.id}/`),
+      api("/api/admin/users/" + selectedUser.id + "/"),
       {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          ...getAuthHeaders(),
         },
         body: JSON.stringify(updatedUser),
       },
     );
 
     if (!response.ok) {
-      console.error("Failed to update user", await response.text());
+      const errorText = await response.text();
+      console.error("Failed to update user:", errorText);
+      alert("Failed to update user: " + errorText);
       return;
     }
 
@@ -224,11 +239,12 @@ const save = async () => {
     setEditDialogOpen(false);
     setSelectedUser(null);
   } catch (error) {
-    console.error("Error updating user", error);
+    console.error("Error updating user:", error);
+    alert("Unexpected error while updating user.");
   }
 };
 
-void save();
+void saveUser();
 ```
 
 };
@@ -237,22 +253,20 @@ const handleDeleteConfirm = () => {
 if (!selectedUser) return;
 
 ```
-const remove = async () => {
+const deleteUser = async () => {
   try {
-    const token = sessionStorage.getItem("accessToken");
-
     const response = await fetch(
-      api(`/api/admin/users/${selectedUser.id}/`),
+      api("/api/admin/users/" + selectedUser.id + "/"),
       {
         method: "DELETE",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+        headers: getAuthHeaders(),
       },
     );
 
     if (!response.ok) {
-      console.error("Failed to delete user", await response.text());
+      const errorText = await response.text();
+      console.error("Failed to delete user:", errorText);
+      alert("Failed to delete user: " + errorText);
       return;
     }
 
@@ -267,11 +281,12 @@ const remove = async () => {
       setCurrentPage(currentPage - 1);
     }
   } catch (error) {
-    console.error("Error deleting user", error);
+    console.error("Error deleting user:", error);
+    alert("Unexpected error while deleting user.");
   }
 };
 
-void remove();
+void deleteUser();
 ```
 
 };
@@ -283,28 +298,26 @@ username: string;
 email: string;
 role: UserRole;
 }) => {
-const create = async () => {
+const createUser = async () => {
 try {
-const token = sessionStorage.getItem("accessToken");
+const response = await fetch(api("/api/admin/users/"), {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+...getAuthHeaders(),
+},
+body: JSON.stringify({
+firstName: userData.firstName,
+lastName: userData.lastName,
+username: userData.username,
+name: (userData.firstName + " " + userData.lastName).trim(),
+email: userData.email,
+role: userData.role,
+status: "active",
+}),
+});
 
 ```
-    const response = await fetch(api("/api/admin/users/"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify({
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        username: userData.username,
-        name: `${userData.firstName} ${userData.lastName}`.trim(),
-        email: userData.email,
-        role: userData.role,
-        status: "active",
-      }),
-    });
-
     if (!response.ok) {
       let errorDetails: unknown;
       const contentType = response.headers.get("content-type") || "";
@@ -314,17 +327,16 @@ const token = sessionStorage.getItem("accessToken");
           ? await response.json()
           : await response.text();
       } catch {
-        errorDetails = "Unable to read server error.";
+        errorDetails = "Unable to read the server error.";
       }
-
-      console.error("Failed to create user", errorDetails);
 
       const message =
         typeof errorDetails === "string"
           ? errorDetails
           : JSON.stringify(errorDetails, null, 2);
 
-      alert(`Failed to create user:\n${message}`);
+      console.error("Failed to create user:", errorDetails);
+      alert("Failed to create user:\n" + message);
       return;
     }
 
@@ -333,12 +345,12 @@ const token = sessionStorage.getItem("accessToken");
     setUsers((previousUsers) => [newUser, ...previousUsers]);
     setAddDialogOpen(false);
   } catch (error) {
-    console.error("Error creating user", error);
-    alert("Unexpected error while creating user. Check the browser console.");
+    console.error("Error creating user:", error);
+    alert("Unexpected error while creating user.");
   }
 };
 
-void create();
+void createUser();
 ```
 
 };
@@ -478,7 +490,10 @@ Manage system users, roles, and permissions </p> </div>
 
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${roleColors[user.role]}`}
+                        className={
+                          "inline-block rounded-full px-3 py-1 text-xs font-semibold " +
+                          roleColors[user.role]
+                        }
                       >
                         {roleLabels[user.role]}
                       </span>
@@ -487,11 +502,12 @@ Manage system users, roles, and permissions </p> </div>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleToggleStatus(user.id)}
-                        className={`inline-block cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                          user.status === "active"
+                        className={
+                          "inline-block cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-colors " +
+                          (user.status === "active"
                             ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200")
+                        }
                       >
                         {user.status === "active" ? "Active" : "Inactive"}
                       </button>
@@ -499,7 +515,7 @@ Manage system users, roles, and permissions </p> </div>
 
                     <td className="px-4 py-3">
                       <p className="text-sm text-gray-600">
-                        {user.lastLogin}
+                        {user.lastLogin || "Never"}
                       </p>
                     </td>
 
@@ -610,7 +626,6 @@ Manage system users, roles, and permissions </p> </div>
     </>
   )}
 </AppLayout>
-
 
 );
 }
