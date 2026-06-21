@@ -158,14 +158,29 @@ if render_hostname and render_hostname not in ALLOWED_HOSTS:
 
 
 # Frontend URL
-FRONTEND_URL = os.getenv(
-    "FRONTEND_URL",
-    "https://aimable-project.onrender.com",
-).rstrip("/")
+FRONTEND_URL = "https://aimable-project.onrender.com"
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
     FRONTEND_URL,
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
