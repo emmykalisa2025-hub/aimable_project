@@ -180,36 +180,63 @@ export default function SystemLogs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = sessionStorage.getItem("accessToken");
-        const response = await fetch(api("/admin/system-logs/"), {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+useEffect(() => {
+  const fetchLogs = async () => {
+    setLoading(true);
+    setError(null);
 
-        if (!response.ok) {
-          console.error("Failed to load system logs", await response.text());
-          setError("Failed to load system logs.");
-          return;
-        }
+    try {
+      const token = sessionStorage.getItem("accessToken");
 
-        const data: SystemLog[] = await response.json();
-        setLogs(data);
-      } catch (err) {
-        console.error("Error loading system logs", err);
-        setError("Unexpected error while loading system logs.");
-      } finally {
-        setLoading(false);
+      const response = await fetch(api("/api/admin/system-logs/"), {
+        headers: {
+          Authorization: token ? "Bearer " + token : "",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        console.error(
+          "Failed to load system logs:",
+          response.status,
+          errorText,
+        );
+
+        setError(
+          "Failed to load system logs. Server returned " +
+            response.status +
+            ".",
+        );
+        return;
       }
-    };
 
-    void fetchLogs();
-  }, []);
+      const data = await response.json();
+
+      // Supports normal arrays and paginated DRF responses.
+      if (Array.isArray(data)) {
+        setLogs(data);
+      } else if (Array.isArray(data.results)) {
+        setLogs(data.results);
+      } else {
+        console.error("Unexpected system logs response:", data);
+        setLogs([]);
+        setError("System logs returned an unexpected format.");
+      }
+    } catch (err) {
+      console.error("Error loading system logs:", err);
+
+      const message =
+        err instanceof Error ? err.message : String(err);
+
+      setError("Unexpected error while loading system logs: " + message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  void fetchLogs();
+}, []);
 
   // Filter logs
   const filteredLogs = useMemo(() => {
