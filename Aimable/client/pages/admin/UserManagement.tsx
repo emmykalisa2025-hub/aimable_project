@@ -71,18 +71,15 @@ const [selectedUser, setSelectedUser] = useState<User | null>(null);
 const getAuthHeaders = () => {
 const token = sessionStorage.getItem("accessToken");
 
-```
 return token
   ? { Authorization: "Bearer " + token }
   : {};
-```
 
 };
 
 const loadUsers = async () => {
 setLoading(true);
 
-```
 try {
   const response = await fetch(api("/api/admin/users/"), {
     headers: getAuthHeaders(),
@@ -107,7 +104,6 @@ try {
 } finally {
   setLoading(false);
 }
-```
 
 };
 
@@ -118,7 +114,6 @@ void loadUsers();
 const filteredUsers = useMemo(() => {
 const term = searchTerm.toLowerCase();
 
-```
 return users.filter((user) => {
   const fullName =
     user.name ||
@@ -133,7 +128,6 @@ return users.filter((user) => {
     user.email.toLowerCase().includes(term)
   );
 });
-```
 
 }, [users, searchTerm]);
 
@@ -177,7 +171,6 @@ headers: getAuthHeaders(),
 },
 );
 
-```
     if (!response.ok) {
       console.error(
         "Failed to toggle user status:",
@@ -199,14 +192,12 @@ headers: getAuthHeaders(),
 };
 
 void toggleUserStatus();
-```
 
 };
 
 const handleEditSubmit = (updatedUser: Partial<User>) => {
 if (!selectedUser) return;
 
-```
 const saveUser = async () => {
   try {
     const response = await fetch(
@@ -245,14 +236,12 @@ const saveUser = async () => {
 };
 
 void saveUser();
-```
 
 };
 
 const handleDeleteConfirm = () => {
 if (!selectedUser) return;
 
-```
 const deleteUser = async () => {
   try {
     const response = await fetch(
@@ -287,7 +276,6 @@ const deleteUser = async () => {
 };
 
 void deleteUser();
-```
 
 };
 
@@ -317,7 +305,6 @@ status: "active",
 }),
 });
 
-```
     if (!response.ok) {
       let errorDetails: unknown;
       const contentType = response.headers.get("content-type") || "";
@@ -351,7 +338,6 @@ status: "active",
 };
 
 void createUser();
-```
 
 };
 
@@ -359,7 +345,6 @@ return ( <AppLayout userRole="admin" userName={userName}> <div className="space-
 User Management </h1> <p className="mt-2 text-gray-600">
 Manage system users, roles, and permissions </p> </div>
 
-```
       <Button
         onClick={() => setAddDialogOpen(true)}
         className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
