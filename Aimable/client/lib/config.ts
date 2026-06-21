@@ -1,10 +1,18 @@
-const rawBase = (import.meta.env.VITE_API_BASE as string) ?? "http://127.0.0.1:8000";
-// normalize: remove trailing slash(es)
-export const API_BASE: string = rawBase.replace(/\/+$|(?=^$)/, "");
+const rawBase = import.meta.env.VITE_API_BASE;
 
-export function api(path: string) {
+if (!rawBase) {
+  throw new Error(
+    "VITE_API_BASE is missing. Add it in the frontend environment variables.",
+  );
+}
+
+// Remove any trailing slash
+export const API_BASE = rawBase.replace(/\/+$/, "");
+
+export function api(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${API_BASE}${normalizedPath}`;
 }
 
 export default API_BASE;
+
